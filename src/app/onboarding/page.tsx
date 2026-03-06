@@ -16,32 +16,39 @@ export default function Onboarding() {
   const router = useRouter()
 
   const handleSubmit = async () => {
-    const {
-      data: { user }
-    } = await supabase.auth.getUser()
 
-    if (!user) return
+  const { data: { session } } = await supabase.auth.getSession()
 
-    const { error } = await supabase.from('profiles').upsert({
-  id: user.id,
-  age: Number(age),
-  gender,
-  height_cm: Number(height),
-  weight_kg: Number(weight),
-  goal,
-  workout_type: workoutType,
-  weekly_days: weeklyDays
-})
-
-if (error) {
-  console.log(error)
-  alert("Error saving profile")
-  return
-}
-
-router.push('/dashboard')
-    router.push('/dashboard')
+  if (!session) {
+    alert("No user session")
+    return
   }
+
+  const user = session.user
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .upsert({
+      id: user.id,
+      age: Number(age),
+      gender,
+      height_cm: Number(height),
+      weight_kg: Number(weight),
+      goal,
+      workout_type: workoutType,
+      weekly_days: weeklyDays
+    })
+
+  if (error) {
+    console.log("PROFILE SAVE ERROR:", error)
+    alert("Profile save failed")
+    return
+  }
+
+  console.log("PROFILE SAVED:", data)
+
+  router.push('/dashboard')
+}
 
   return (
     <div className="flex h-screen items-center justify-center">
