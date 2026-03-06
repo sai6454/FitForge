@@ -52,43 +52,46 @@ setWeightData(formatted)
 }
 
 // FETCH PROFILE
-const fetchProfile = async()=>{
+const fetchProfile = async () => {
 
-const {data:{user}} = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
 
-if(!user){
-router.push('/auth')
-return
-}
+  if (!session) {
+    router.push('/auth')
+    return
+  }
 
-const {data} = await supabase
-.from('profiles')
-.select('*')
-.eq('id',user.id)
-.single()
+  const user = session.user
 
-setProfile(data)
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .maybeSingle()
 
-if(data?.goal_weight){
-setGoalWeight(data.goal_weight)
-}
+  if (error) {
+    console.error(error)
+    return
+  }
 
-await loadWeightData(user.id)
+  if (!data) {
+    router.push('/onboarding')
+    return
+  }
 
-if(data){
+  setProfile(data)
 
-const result = calculateBMR({
-weight:data.weight_kg,
-height:data.height_cm,
-age:data.age,
-gender:data.gender,
-weeklyDays:data.weekly_days
-})
+  await loadWeightData(user.id)
 
-setCalories(result)
+  const result = calculateBMR({
+    weight: data.weight_kg,
+    height: data.height_cm,
+    age: data.age,
+    gender: data.gender,
+    weeklyDays: data.weekly_days
+  })
 
-}
-
+  setCalories(result)
 }
 
 useEffect(()=>{
@@ -309,9 +312,9 @@ return(
 return null
 }
 
-if(!profile||!calories)
-return <p className="p-6 text-white">Loading...</p>
-
+if (!profile) {
+  return <p className="p-6 text-white">Loading dashboard...</p>
+}
 return(
 
 <div className="p-4 md:p-6 min-h-screen bg-gradient-to-br from-black via-zinc-900 to-black text-white space-y-6">

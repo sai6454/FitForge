@@ -22,16 +22,16 @@ export default function Onboarding() {
 
     if (!user) return
 
-    await supabase.from('profiles').insert({
-      id: user.id,
-      age: Number(age),
-      gender,
-      height_cm: Number(height),
-      weight_kg: Number(weight),
-      goal,
-      workout_type: workoutType,
-      weekly_days: weeklyDays
-    })
+    await supabase.from('profiles').upsert({
+  id: user.id,
+  age: Number(age),
+  gender,
+  height_cm: Number(height),
+  weight_kg: Number(weight),
+  goal,
+  workout_type: workoutType,
+  weekly_days: weeklyDays
+})
 
     router.push('/dashboard')
   }
