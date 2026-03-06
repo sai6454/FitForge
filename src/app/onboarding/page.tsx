@@ -22,7 +22,7 @@ export default function Onboarding() {
 
     if (!user) return
 
-    await supabase.from('profiles').upsert({
+    const { error } = await supabase.from('profiles').upsert({
   id: user.id,
   age: Number(age),
   gender,
@@ -33,6 +33,13 @@ export default function Onboarding() {
   weekly_days: weeklyDays
 })
 
+if (error) {
+  console.log(error)
+  alert("Error saving profile")
+  return
+}
+
+router.push('/dashboard')
     router.push('/dashboard')
   }
 
