@@ -84,11 +84,11 @@ export default function AuthPage() {
         <button
   onClick={async () => {
     await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: "https://fit-forge-sai.vercel.app/onboarding"
-      }
-    })
+  provider: "google",
+  options: {
+    redirectTo: `${window.location.origin}/onboarding`
+  }
+})
   }}
   className="bg-white text-black px-4 py-2 rounded w-full"
 >
